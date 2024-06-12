@@ -1,0 +1,130 @@
+[
+    {
+        "name": "NoOCR",
+        "modules": [
+            {
+                "name": "ImportSwitch",
+                "parameter": {
+                    "dpi": 200
+                }
+            },
+            {
+                "name": "TATRDetection",
+                "parameter": {
+                    "only_captions": false,
+                    "threshold": 0.96,
+                    "nms_threshold": 0.1,
+                    "extend_to_lines": false,
+                    "adjust_to": []
+                }
+            }
+        ]
+    },
+    {
+        "name": "OCR",
+        "modules": [
+            {
+                "name": "DeleteUtilityModule",
+                "parameter": {
+                    "delete": [
+                        "Block",
+                        "Line",
+                        "String"
+                    ]
+                }
+            },
+            {
+                "name": "ConnectedComponentOCRModule",
+                "parameter": {
+                    "mode": "Page",
+                    "lang": "en",
+                    "add_new_area": [
+                        "Line",
+                        "String"
+                    ],
+                    "split_words": false,
+                    "character_distance": 16,
+                    "ignore_overlap_merge_char": 2,
+                    "word_distance": 45,
+                    "ignore_overlap_merge_word": 0,
+                    "min_width_bb": 5,
+                    "min_height_bb": 5,
+                    "max_size_bb": 100,
+                    "skip_merge": false
+                }
+            },
+            {
+                "name": "GuppyOCRModule",
+                "parameter": {
+                    "model_path": "/usr/src/server/model_best.pth",
+                    "padding": [
+                        8,
+                        4
+                    ],
+                    "split_words": false,
+                    "apply_to": ["String"],
+                    "device": "cpu",
+                    "batch_size": 8
+                }
+            }
+            
+        ]
+    },
+    {
+        "name": "GlassDigital",
+        "modules": [
+            {
+                "name": "LogicalLineGuesser", 
+                "parameter": {
+                    "apply_to": "Table",
+                    "subelement": "String",
+                    "h_split": 1,
+                    "v_split": 2,
+                    "gap_between_rows": 2,
+                    "gap_between_columns": 15
+                }
+            },
+            {
+                "name": "CellDetector",
+                "parameter": {
+                    "space_between_words": 35,
+                    "space_between_lines": 2,
+                    "sub/super_tolerance": 8,
+                    "IoU_merge_threshold": 0.1,
+                    "apply_to": "String",
+                    "lines": "Line",
+                    "strings": "String"
+                }
+            },
+            {
+                "name": "MarkovChainRecognizer",
+                "parameter": {
+                    "threshold_vertical_translation": 3,
+                    "lines": "Line",
+                    "strings": "String"
+                }
+            },
+            {
+                "name": "FunctionalRecognizer",
+                "parameter": {
+                    "no_predefined_column_labels": 1,
+                    "no_predefined_row_labels": 1
+                }
+            },
+            {
+                "name": "MetadataExtractor",
+                "parameter": {
+                    "lines": "Line",
+                    "string": "String"
+                }
+            },
+            {
+                "name": "GlassExtractor",
+                "parameter": {
+                    "lines": "Line",
+                    "string": "String"
+                }
+            }
+        ]
+    }
+]

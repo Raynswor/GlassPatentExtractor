@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kieta_modules"
+authors = [
+    { name = "Sebastian Kempf", email = "sebastian.kempf@uni-wuerzburg.de" },
+]
+description = "Modules for KIETA"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["one", "two"]
+license = { text = "MIT" }
+classifiers = ["Programming Language :: Python :: 3"]
+dependencies = [
+    #"kieta_data_objs @ git+https://gitlab+deploy-token-138:gldt-SntLC9xSsC3vzFNPGLUH@gitlab2.informatik.uni-wuerzburg.de/sek50xe/kieta_data_objs.git",
+    "requests",
+    "pymupdf",
+    "opencv-python-headless",
+    "owlready2",
+    "numpy",
+    "fuzzywuzzy",
+    "python-Levenshtein",
+    "rdflib",
+    "Pillow",
+    "timm",
+    "tqdm",
+    "torch",
+    "transformers",
+    "sentence-transformers",
+    "torchvision",
+    "doxapy",
+    "pandas",
+    "scikit-learn",
+    "jsonpickle",
+    "albumentations",
+    "lxml"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+full=[
+        "paddlepaddle-gpu @ https://pypi.tuna.tsinghua.edu.cn/simple", 
+        "paddleocr>=2.0.1", 
+        "guppyocr @ git+https://gitlab+deploy-token-113:pdXYgWy8yHMq5it7CxK6@gitlab2.informatik.uni-wuerzburg.de/nof36hn/guppyocr.git@tensorboard",
+        "pixel_classifier_torch @ git+https://github.com/Gawajn/segmentation-pytorch"
+]
+full_ocr = [
+    "paddlepaddle-gpu @ https://pypi.tuna.tsinghua.edu.cn/simple",
+    "paddleocr>=2.0.1",
+    "guppyocr @ git+https://gitlab+deploy-token-113:pdXYgWy8yHMq5it7CxK6@gitlab2.informatik.uni-wuerzburg.de/nof36hn/guppyocr.git@tensorboard",
+]
+paddle = [
+    "paddlepaddle-gpu @ https://pypi.tuna.tsinghua.edu.cn/simple",
+    "paddleocr>=2.0.1",
+]
+guppyocr = [
+    "guppyocr @ git+https://gitlab+deploy-token-113:pdXYgWy8yHMq5it7CxK6@gitlab2.informatik.uni-wuerzburg.de/nof36hn/guppyocr.git@tensorboard",
+]
+baselines = [
+    "pixel_classifier_torch @ git+https://github.com/Gawajn/segmentation-pytorch",
+]
+camelot = ["camelot-py"]

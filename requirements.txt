@@ -1,0 +1,24 @@
+Flask
+Flask-Cors
+apscheduler
+Flask-ApScheduler
+torch -i https://download.pytorch.org/whl/cpu
+torchvision -i https://download.pytorch.org/whl/cpu
+jsonpickle
+camelot-py
+opencv_python_headless
+pymupdf
+Pillow
+owlready2
+requests
+redis
+scipy
+transformers
+sentence_transformers
+guppyocr @ git+https://gitlab+deploy-token-113:pdXYgWy8yHMq5it7CxK6@gitlab2.informatik.uni-wuerzburg.de/nof36hn/guppyocr.git@tensorboard
+lxml
+pandas
+scikit-learn
+jsonpickle
+albumentations
+kieta_data_objs @ git+https://gitlab+deploy-token-138:gldt-SntLC9xSsC3vzFNPGLUH@gitlab2.informatik.uni-wuerzburg.de/sek50xe/kieta_data_objs.git

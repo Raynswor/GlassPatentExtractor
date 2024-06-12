@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kieta_data_objs"
+authors = [
+    {name = "Sebastian Kempf", email = "sebastian.kempf@uni-wuerzburg.de"},
+]
+description = "Datastructures for KIETA"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["one", "two"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "Pillow",
+]
+dynamic = ["version"]

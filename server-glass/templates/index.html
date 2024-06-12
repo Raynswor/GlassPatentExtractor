@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF</title>
+    <script>
+        const controller = new AbortController();
+
+        function handleFileUpload(event, uploadURL) {
+            // add to uploadURL the device type
+            // const device = document.getElementById('device').value;
+            // uploadURL += `_${device}`;
+
+            event.preventDefault();
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const fileType = file.name.split('.').pop().toLowerCase();
+                const isValidFile = fileType === 'pdf' || fileType === 'PDF' || file.type === 'application/pdf';
+
+                if (!isValidFile) {
+                    alert('Please upload a valid PDF file.');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('file', file);
+
+                startLoading();
+
+                fetch(uploadURL,
+                {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => poll_for_updates(data['task_id']))
+                    .catch(error => {
+                        console.error('Error:', error);
+                        stopLoading();
+                    });
+            }
+        }
+
+        let polling = null;
+
+        function poll_for_updates(task_id) {
+            // poll for updates
+            polling = setInterval(() => {
+                check_status(task_id);
+            }, 10000);
+        }
+
+        function check_status(taskId) {
+            fetch(`/status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data['status'] === 'done' || data['status'] === 'failed') {
+                        // stop polling
+                        clearInterval(polling);
+                        stopLoading();
+                    }
+                    if (data['status'] === 'done') {
+                        // enable download buttons
+                        enableButtons();
+                        // display metadata
+                        displayFileDetails(data['result']['metadata']);
+                        // display glass configurations
+                        displaySteps(data['result']['steps']);
+                    } else if (data['status'] === 'failed') {
+                        alert('Task failed', data['result']); 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    stopLoading();
+                });
+        }
+
+        function displayFileDetails(data) {
+            const table = document.getElementById('metadata');
+            table.innerHTML = `
+                <tr>
+                    <th>Publication Number</th>
+                    <td>${data["hasDataResourceName"]}</td>
+                </tr>
+                <tr>
+                    <th>Publication Date</th>
+                    <td>${data["hasDataResourceDate"]}</td>
+                </tr>
+                <tr>
+                    <th>Patent Title</th>
+                    <td>${data["hasPatentTitle"]}</td>
+                </tr>
+                <tr>
+                    <th>Applicant</th>
+                    <td>${data["hasApplicant"]}</td>
+                </tr>
+                <tr>
+                    <th>Inventor</th>
+                    <td>${data["hasInventor"]}</td>
+                </tr>
+                <tr>
+                    <th>Assignee</th>
+                    <td>${data["hasInventor"]}</td>
+                </tr>                
+                <tr>
+                    <th>Abstract</th>
+                    <td>${data["hasAbstract"]}</td>
+                </tr>
+                <tr>
+                    <th>IPC</th>
+                    <td>${data["hasIPC"]}</td>
+                </tr>
+            `;
+        }
+        function displaySteps(data) {
+            const table = document.getElementById('steps');
+            // get all headers
+            const headers = data.map((step, index) => {
+                return Object.keys(step['setpoints'])
+            });
+            //  make that flat
+            const flatHeaders = headers.flat();
+            //make unique
+            const uniqueHeaders = [...new Set(flatHeaders)];
+
+            // create table headers
+            // sort headers so columns with highest number of setpoints are on the left
+            uniqueHeaders.sort((a, b) => {
+                // number of non-null setpoints for a
+                return data.filter((step) => step['setpoints'][b]).length - data.filter((step) => step['setpoints'][a]).length;
+            });
+
+            let header_str = `
+                <tr>
+                    <th>Glass</th>
+            `;
+            uniqueHeaders.forEach((header) => {
+                header_str += `
+                    <th colspan="2">${header}</th>
+                `;
+            });
+            header_str += `
+                </tr>
+            `;
+
+            data.sort((a, b) => {
+                return a['generatedObjectIdentifier'] - b['generatedObjectIdentifier'];
+            }).
+                forEach((step, index) => {
+                    header_str += `
+                    <tr>
+                        <th>${step['generatedObjectIdentifier']}</th>
+                `;
+                    uniqueHeaders.forEach((header) => {
+                        // if the header is not in the setpoints, add an empty cell
+                        if (!step['setpoints'][header]) {
+                            header_str += `
+                            <td></td>
+                            <td></td>
+                        `;
+                            return;
+                        }
+                        header_str += `
+                        <td>${step['setpoints'][header]['value']}</td><td>
+                    `;
+                        // if the header unit not null
+                        if (step['setpoints'][header]['unit'] && step['setpoints'][header]['unit'] !== 'null') {
+                            header_str += `${step['setpoints'][header]['unit']}`;
+                        }
+                        header_str += `</td>`;
+                    });
+                    header_str += `
+                    </tr>
+                `;
+                });
+            table.innerHTML = header_str;
+        }
+        function downloadCSV() {
+            //download the table as csv
+            const table = document.getElementById('steps');
+            const rows = table.querySelectorAll('tr');
+            const csv = [];
+            // handle header separately because of colspan
+            const headerRow = rows[0].querySelectorAll('th');
+            const header = [];
+            for (let i = 0; i < headerRow.length; i++) {
+                header.push('"' + headerRow[i].innerText + '"');
+                if (i > 0)
+                    header.push('"' + headerRow[i].innerText + '"');
+            }
+            csv.push(header.join(','));
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].querySelectorAll('td');
+                const rowArray = ['"' + rows[i].querySelectorAll('th')[0].innerText + '"'];
+                for (let j = 0; j < row.length; j++) {
+                    // if no content in the cell, add empty string
+                    if (!row[j].innerText) {
+                        rowArray.push('" "');
+                        continue;
+                    }
+                    rowArray.push('"' + row[j].innerText + '"');
+                }
+                csv.push(rowArray.join(','));
+            }
+            const csvData = csv.join('\n');
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+
+            const downloadButton = document.getElementById('downloadButtonCSV');
+            downloadButton.onclick = () => {
+                window.location.href = url;
+            };
+            downloadButton.click();
+        }
+
+        function downloadHTML() {
+            // download glass configuration table as html
+            const table = document.getElementById('steps');
+            const html = table.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+
+            const downloadButton = document.getElementById('downloadButtonHTML');
+            downloadButton.onclick = () => {
+                window.location.href = url;
+            };
+            downloadButton.click();
+
+        }
+
+        function enableButtons() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach((button) => {
+                button.disabled = false;
+            });
+            const fileInput = document.getElementById('pdfFile');
+            const selectedFileName = document.getElementById('selectedFileName');
+            selectedFileName.innerText = fileInput.files[0].name;
+        }
+
+        function startLoading() {
+            document.getElementById('loader').classList.remove('hidden');
+        }
+
+        function stopLoading() {
+            document.getElementById('loader').classList.add('hidden');
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #0066cc;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+        }
+
+        button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #f0f0f0;
+            /* Ensure background color to prevent overlapping issue */
+            z-index: 1;
+            /* Ensure the sticky column is above other cells */
+        }
+
+        .cancel {
+            background-color: #ff0000;
+        }
+
+        /* Loader */
+        .loader {
+            border: 16px solid #f3f3f3;
+            /* Light grey */
+            border-top: 16px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Center the loader */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Upload Patent PDF File</h1>
+    <form id="uploadForm" onsubmit="handleFileUpload(event)" enctype="multipart/form-data">
+        <button id="fileInputButton" onclick="document.getElementById('pdfFile').click()">Upload PDF File</button>
+        <label id="selectedFileName" for="pdfFile">No file selected</label>
+        <input type="file" id="pdfFile" name="pdfFile" accept="application/pdf" style="display: none"
+            onchange="enableButtons()">
+
+        <button type="submit" onclick="handleFileUpload(event, '/single_pdf_async')" disabled>Execute</button>
+        <button type="submit" onclick="handleFileUpload(event, '/single_pdf_ocr_async')" disabled>Execute with
+            OCR(slower)</button>
+        <!-- <button id="cancel" class="cancel" type="button" disabled>Cancel</button> -->
+        <!-- select device type - cpu or gpu-->
+        <!-- <select name="device" id="device">
+            <option value="cpu">CPU</option>
+            <option value="gpu">GPU</option>
+        </select> -->
+    </form>
+    <!-- download button -->
+    <button id="downloadButtonCSV" onclick="downloadCSV()" disabled>Download as CSV</button>
+    <button id="downloadButtonHTML" onclick="downloadHTML()" disabled>Download as HTML</button>
+
+    <h2>Metadata</h2>
+    <table id="metadata" border="1">
+        <!-- File details will be inserted here -->
+    </table>
+
+    <h2>Glass Configurations</h2>
+    <!-- scrollable container -->
+    <div style="overflow-x:auto;">
+        <table id="steps" border="1">
+            <!-- File details will be inserted here -->
+        </table>
+    </div>
+
+    <div class="loader-container">
+        <div class="loader hidden" id="loader"></div>
+    </div>
+</body>
+</html>

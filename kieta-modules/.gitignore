@@ -1,0 +1,7 @@
+**/build/**
+*.egg-info
+.env
+.vscode
+.idea
+**/__pycache__/**
+kieta_modules/tatrstuff/detr/*

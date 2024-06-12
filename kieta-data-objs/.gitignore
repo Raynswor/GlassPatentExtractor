@@ -1,0 +1,6 @@
+**/build/**
+*.egg-info
+.env
+.vscode
+.idea
+**/__pycache__/**
