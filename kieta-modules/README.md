@@ -1,24 +1,48 @@
-# Kieta Modules
+# KIETA Modules
+
+## Modules used within the pipeline
+
+### PDFConvert
+This module is responsible for converting PDF files into the internal data structure defined by kieta-data-objs.
+
+### TATRDetection (tatr.py)
+Performs Table Detection (TD) to detect tables in documents.
+This module is based on 
+```
+@software{smock2021tabletransformer,
+  author = {Smock, Brandon and Pesala, Rohith},
+  month = {06},
+  title = {{Table Transformer}},
+  url = {https://github.com/microsoft/table-transformer},
+  version = {1.0.0},
+  year = {2021}
+}
+```
+
+### ConnectedComponentOCRModule (ocr/text_detection.py)
+Performs connected component analysis to detect text regions.
+
+### GuppyOCRModule (ocr/ocr.py)
+Performs ocr on specified regions.
+
+### CellDetector (cellDetector.py)
+Detects cells in specified regions.
+
+### MarkovChainRecognizer (heuristicRecognition.py)
+Performs Table Structure Recognition (TSR) to arrange cells as table matrix.
+
+### FunctionalRecognizer (functionalRecognition.py)
+Performs functional analysis of table cells.
+
+### MetadataExtractor (specific_modules/glass/meta_data.py)
+Performs metadata lookup for specified patent number.
+
+### GlassExtractor (specific_modules/glass/glassExtraction.py)
+Extracts glass configurations across tables. Simple recognition of units included.
 
 
-## Available Modules
 
-### Import
-
-#### PDFConvert
-#### PageXMLImport
-#### JSONImport
-#### ImageImport
-## Available Modules
-
-### Import
-
-- PDFConvert
-- PageXMLImport
-- JSONImport
-- ImageImport
-
-### Export
+<!-- ### Export
 
 - ExportPageXMLModule
     - confidence_threshold (default: -1)
@@ -52,5 +76,5 @@
         - Defines boundingbox color of each category. Has to be same length as category
 - ExportCOCOModule
     - super_categories (default: ["Table"])
-    - type (default: ["Table"])
+    - type (default: ["Table"]) -->
 
