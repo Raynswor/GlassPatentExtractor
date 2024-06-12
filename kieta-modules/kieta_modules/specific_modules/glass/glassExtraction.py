@@ -17,6 +17,8 @@ from kieta_data_objs import Document, Area, BoundingBox
 from kieta_modules import Module
 from kieta_modules import util
 
+import Levenshtein
+
 import re
 
 
@@ -220,10 +222,231 @@ def content(doc: Document, l: List[Area]) -> List[str]:
     return [doc.get_area_obj(rr).data['content'] for ll in l for rr in doc.references.byId[ll.oid]]
 
 
+
+knowledge = {
+    "SiO₂": [
+        "SiO2",
+        "SiO,",
+        "Si0,",
+        "Silicon oxide",
+        "Sio2"
+    ],
+    "B₂O₃": [
+        "B2O3",
+        "B,O3",
+        "B,03",
+        "Boron oxide",
+        "B2o3"
+    ],
+    "Li₂O": [
+        "Li2O",
+        "Li,O",
+        "Li,0",
+        "Lithium oxide",
+        "Li2o"
+    ],
+    "MgO": [
+        "MgO",
+        "Mg0",
+        "Mgo"
+    ],
+    "Na₂O": [
+        "Na2O",
+        "Na,O",
+        "Na,0",
+        "Sodium oxide"
+    ],
+    "Al₂O₃": [
+        "Al2O3",
+        "Al,O3",
+        "Al,03",
+        "AI203",
+        "AI,03",
+        "Aluminium oxide",
+        "Al2o3"
+    ],
+    "Ga₂O₃": [
+        "Ga2O3",
+        "Ga,O3",
+        "Ga,03",
+        "Gallium oxide",
+        "Ga2o3"
+    ],
+    "K₂O": [
+        "K2O",
+        "K20",
+        "K,O",
+        "K,0",
+        "Κ20",
+        "Potassium oxide",
+        "K2o"
+    ],
+    "CaO": [
+        "CaO",
+        "Ca0",
+        "Calcium oxide",
+        "Cao"
+    ],
+    "BaO": [
+        "BaO",
+        "Ba0",
+        "Barium oxide",
+        "Bao"
+    ],
+    "SrO": [
+        "SrO",
+        "Sr0",
+        "Strontium oxide",
+        "Sro",
+        "SRQ"
+    ],
+    "SnO₂": [
+        "SnO2",
+        "SnO,",
+        "Sn0,",
+        "Tin oxide",
+        "Sn02",
+        "Sno2"
+    ],
+    "ZrO₂": [
+        "ZrO2",
+        "ZrO,",
+        "Zr0,",
+        "2r0,",
+        "Zirconium oxide",
+        "Zro2"
+    ],
+    "TiO₂": [
+        "TiO2",
+        "TiO,",
+        "Ti0,",
+        "Titanium oxide",
+        "Tio2"
+    ],
+    "CeO₂": [
+        "CeO2",
+        "CeO,",
+        "Ce0,",
+        "Cerium oxide",
+        "Ce02",
+        "Ceo2"
+    ],
+    "NAOH": [
+        "NaOH",
+        "Na0H",
+        "Sodium hydroxide"
+    ],
+    "P₂O₅": [
+        "P2O5",
+        "P,O5",
+        "P,05",
+        "Phosphorus oxide",
+        "P2o5"
+    ],
+    "R₂O": [
+        "R2O",
+        "R,O",
+        "R,0",
+        "R2o"
+    ],
+    "Fe₂O₃": [
+        "Fe2O3",
+        "Fe,O3",
+        "Fe,03",
+        "Iron oxide",
+        "Fe2o3"
+    ],
+    "NH4F": [
+        "NH4F",
+        "Ammonium fluoride"
+    ],
+    "SO₃": [
+        "SO3",
+        "Sulfur oxide",
+        "So3",
+        "So0,"
+    ],
+    "Anneal point": [
+        "Anneal pt.",
+        "Anneal pt",
+        "Anneal point"
+        "Anneal"
+    ],
+    "Strain point": [
+        "Strain pt.",
+        "Strain pt",
+        "Strain point",
+        "Strain"
+    ],
+    "Softening point": [
+        "Softening pt.",
+        "Softening pt",
+        "Softening point",
+    ],
+    "Youngs modulus": [
+        "Young's modulus",
+        "Young's mod.",
+        "Young's",
+        "Youngs modulus",
+        "Youngs mod.",
+    ],
+    "Poisson ratio": [
+        "Poisson's ratio",
+        "Poisson's",
+        "Poisson ratio",
+        "Poisson"
+    ],
+    "Refractive index": [
+        "Refractive index",
+        "Refractive",
+        "Refractive idx."
+    ],
+    "Glass transition point": [
+        "Glass transition pt.",
+        "Glass transition pt",
+        "Glass transition point",
+        "Glass transition"
+    ],
+    "Thermal expansion coefficient": [
+        "Thermal expansion coeff.",
+        "Thermal expansion coeff",
+        "Thermal expansion coefficient",
+        "Thermal expansion",
+        "Themmal expansion"
+    ],
+    "Specific gravity": [
+        "Specific gravity",
+        "Specific grav.",
+    ],
+    "Fracture toughness": [
+        "Fracture toughness",
+        "Fracture tough.",
+    ],
+}
+
+knowledge_val_to_key = dict()
+for k, v in knowledge.items():
+    for vv in v:
+        knowledge_val_to_key[vv] = k
+    knowledge_val_to_key[k] = k
+
 @dataclass
 class PropertyData:
     name: str
     unit: str
+
+    def __init__(self, name: str, unit: str) -> None:
+        # check name against knowledge with levensthein distance
+
+        if name not in knowledge:
+            for k in knowledge_val_to_key:
+                t_name = name.replace(' ', '').replace('(','').replace(')','')
+                if k == t_name or len(t_name) > 5 and Levenshtein.distance(k, t_name) <= 3:
+                    name = knowledge_val_to_key[k]
+                    break
+        self.name = name
+
+        self.unit = unit
 
 
 # TODO: If there are multi-level col labels, only one is recognized. It should be all of them

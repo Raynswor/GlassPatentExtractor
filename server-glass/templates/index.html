@@ -149,7 +149,7 @@
             `;
 
             data.sort((a, b) => {
-                return a['generatedObjectIdentifier'] - b['generatedObjectIdentifier'];
+                return a['generatedObjectIdentifier'].localeCompare(b['generatedObjectIdentifier']);
             }).
                 forEach((step, index) => {
                     header_str += `
