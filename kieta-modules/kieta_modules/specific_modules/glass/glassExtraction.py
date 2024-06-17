@@ -222,231 +222,61 @@ def content(doc: Document, l: List[Area]) -> List[str]:
     return [doc.get_area_obj(rr).data['content'] for ll in l for rr in doc.references.byId[ll.oid]]
 
 
+def load_mapping(file_path):
+    import json
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    
+    compiled_mapping = {}
+    for key, patterns in data.items():
+        compiled_mapping[key] = [re.compile(pattern) for pattern in patterns]
+    
+    return compiled_mapping
 
-knowledge = {
-    "SiO₂": [
-        "SiO2",
-        "SiO,",
-        "Si0,",
-        "Silicon oxide",
-        "Sio2"
-    ],
-    "B₂O₃": [
-        "B2O3",
-        "B,O3",
-        "B,03",
-        "Boron oxide",
-        "B2o3"
-    ],
-    "Li₂O": [
-        "Li2O",
-        "Li,O",
-        "Li,0",
-        "Lithium oxide",
-        "Li2o"
-    ],
-    "MgO": [
-        "MgO",
-        "Mg0",
-        "Mgo"
-    ],
-    "Na₂O": [
-        "Na2O",
-        "Na,O",
-        "Na,0",
-        "Sodium oxide"
-    ],
-    "Al₂O₃": [
-        "Al2O3",
-        "Al,O3",
-        "Al,03",
-        "AI203",
-        "AI,03",
-        "Aluminium oxide",
-        "Al2o3"
-    ],
-    "Ga₂O₃": [
-        "Ga2O3",
-        "Ga,O3",
-        "Ga,03",
-        "Gallium oxide",
-        "Ga2o3"
-    ],
-    "K₂O": [
-        "K2O",
-        "K20",
-        "K,O",
-        "K,0",
-        "Κ20",
-        "Potassium oxide",
-        "K2o"
-    ],
-    "CaO": [
-        "CaO",
-        "Ca0",
-        "Calcium oxide",
-        "Cao"
-    ],
-    "BaO": [
-        "BaO",
-        "Ba0",
-        "Barium oxide",
-        "Bao"
-    ],
-    "SrO": [
-        "SrO",
-        "Sr0",
-        "Strontium oxide",
-        "Sro",
-        "SRQ"
-    ],
-    "SnO₂": [
-        "SnO2",
-        "SnO,",
-        "Sn0,",
-        "Tin oxide",
-        "Sn02",
-        "Sno2"
-    ],
-    "ZrO₂": [
-        "ZrO2",
-        "ZrO,",
-        "Zr0,",
-        "2r0,",
-        "Zirconium oxide",
-        "Zro2"
-    ],
-    "TiO₂": [
-        "TiO2",
-        "TiO,",
-        "Ti0,",
-        "Titanium oxide",
-        "Tio2"
-    ],
-    "CeO₂": [
-        "CeO2",
-        "CeO,",
-        "Ce0,",
-        "Cerium oxide",
-        "Ce02",
-        "Ceo2"
-    ],
-    "NAOH": [
-        "NaOH",
-        "Na0H",
-        "Sodium hydroxide"
-    ],
-    "P₂O₅": [
-        "P2O5",
-        "P,O5",
-        "P,05",
-        "Phosphorus oxide",
-        "P2o5"
-    ],
-    "R₂O": [
-        "R2O",
-        "R,O",
-        "R,0",
-        "R2o"
-    ],
-    "Fe₂O₃": [
-        "Fe2O3",
-        "Fe,O3",
-        "Fe,03",
-        "Iron oxide",
-        "Fe2o3"
-    ],
-    "NH4F": [
-        "NH4F",
-        "Ammonium fluoride"
-    ],
-    "SO₃": [
-        "SO3",
-        "Sulfur oxide",
-        "So3",
-        "So0,"
-    ],
-    "Anneal point": [
-        "Anneal pt.",
-        "Anneal pt",
-        "Anneal point"
-        "Anneal"
-    ],
-    "Strain point": [
-        "Strain pt.",
-        "Strain pt",
-        "Strain point",
-        "Strain"
-    ],
-    "Softening point": [
-        "Softening pt.",
-        "Softening pt",
-        "Softening point",
-    ],
-    "Youngs modulus": [
-        "Young's modulus",
-        "Young's mod.",
-        "Young's",
-        "Youngs modulus",
-        "Youngs mod.",
-    ],
-    "Poisson ratio": [
-        "Poisson's ratio",
-        "Poisson's",
-        "Poisson ratio",
-        "Poisson"
-    ],
-    "Refractive index": [
-        "Refractive index",
-        "Refractive",
-        "Refractive idx."
-    ],
-    "Glass transition point": [
-        "Glass transition pt.",
-        "Glass transition pt",
-        "Glass transition point",
-        "Glass transition"
-    ],
-    "Thermal expansion coefficient": [
-        "Thermal expansion coeff.",
-        "Thermal expansion coeff",
-        "Thermal expansion coefficient",
-        "Thermal expansion",
-        "Themmal expansion"
-    ],
-    "Specific gravity": [
-        "Specific gravity",
-        "Specific grav.",
-    ],
-    "Fracture toughness": [
-        "Fracture toughness",
-        "Fracture tough.",
-    ],
-}
+def match_string(mapping, string):
+    for key, patterns in mapping.items():
+        for pattern in patterns:
+            if pattern.match(string):
+                return key, pattern
+    return None, None
 
-knowledge_val_to_key = dict()
-for k, v in knowledge.items():
-    for vv in v:
-        knowledge_val_to_key[vv] = k
-    knowledge_val_to_key[k] = k
 
 @dataclass
 class PropertyData:
     name: str
     unit: str
+    comment: str = None
 
-    def __init__(self, name: str, unit: str) -> None:
+    def __init__(self, name: str, unit: str, knowledge) -> None:
         # check name against knowledge with levensthein distance
-
-        if name not in knowledge:
-            for k in knowledge_val_to_key:
-                t_name = name.replace(' ', '').replace('(','').replace(')','')
-                if k == t_name or len(t_name) > 5 and Levenshtein.distance(k, t_name) <= 3:
-                    name = knowledge_val_to_key[k]
-                    break
+        self.comment = "new"
+        old_name = name
+        if '+' in name:
+            name = name.split('+')
+            name = [n.strip() for n in name]
+            name = [n for n in name if n != '']
+            if len(name) > 1:
+                self.comment = ""
+                for i in range(len(name)):
+                    if (t:=match_string(knowledge, name[i]))[0] is not None:
+                        self.comment += f"{name[i]} -> {t[1]}  "
+                        name[i] = t[0]
+                name = ' + '.join(name)
+            else:
+                name = old_name
+        else:
+            if (t:=match_string(knowledge, name))[0] is not None:
+                self.comment = f"{name} -> {t[1]}"
+                name = t[0]
+                if ("total amount" in old_name):
+                    name += " [total]"
         self.name = name
 
-        self.unit = unit
+        # safeguard unit
+        if (unit == 'wt%' or unit == 'mol%' or unit == 'mass%') and ' ' in self.name and '+' not in self.name:
+            self.unit = '-'
+        else:
+            self.unit = unit
 
 
 # TODO: If there are multi-level col labels, only one is recognized. It should be all of them
@@ -459,6 +289,7 @@ class GlassExtractor(Module):
         self.pattern = r'[\[{(]([^\]\[\}\{\)\(]+)[\]})]'
         self.lines = parameters.get('lines', 'Line')
         self.strings = parameters.get('strings', 'String')
+        self.knowledge = load_mapping(parameters.get('knowledge', 'knowledge.json'))
 
     def execute(self, inpt: Document):
         resource_refs, comp_unit = self.parse_titlepage(inpt)
@@ -473,6 +304,7 @@ class GlassExtractor(Module):
 
         table_order = list()
         prev_prefix = None
+        claims = list()
         try:
             for table_area in inpt.get_area_type('Table'):
                 if "cells" not in table_area.data.keys():
@@ -500,6 +332,28 @@ class GlassExtractor(Module):
                                 area_obj.data['row_label'], area_obj.data['column_label'] = True, False
                 else: 
                     table = copy(table_area.data['cells'])
+
+                # decide if it is a table with only two columns
+                # if so, it is a claims overview table
+                if len(table[0]) == 2:
+                    current_claim = list()
+                    self.debug_msg(f"Found claims table {table_area.oid}")
+                    # left is composition, right is text
+                    for i in range(len(table)):
+                        if not table[i][0] or not table[i][1]:
+                            continue
+                        left = inpt.get_area_obj(table[i][0]).data['content']
+
+                        ''
+
+                        if (t:=match_string(self.knowledge, left))[0] is not None:
+                            left = t[0]
+                        current_claim.append([
+                            left,
+                            inpt.get_area_obj(table[i][1]).data['content']
+                        ])
+                    claims.append(current_claim)
+                    continue
 
                 prefix_names = {"example", "number", "glass"}
 
@@ -594,17 +448,14 @@ class GlassExtractor(Module):
                                     ' ': '',
                                 }))
                                 found_unit = found_unit[0].replace(' ','')
-                            # NOTE: this is just an observation and probably does not work for all cases
-                            elif "temperature" in cont or "temp." in cont.lower() or "temp" in cont.lower():
-                                found_unit = "°C"
                             else:
                                 found_unit = comp_unit
                             
                             if row in properties.keys():
                                 print(f"WARNING: row has label already {properties[row]}, expanding to {properties[row].name + cont}")
-                                properties[row] = PropertyData(properties[row].name + cont, found_unit if found_unit != comp_unit else properties[row].unit)
+                                properties[row] = PropertyData(properties[row].name + cont, found_unit if found_unit != comp_unit else properties[row].unit, self.knowledge)
                             else:
-                                properties[row] = PropertyData(cont, found_unit)
+                                properties[row] = PropertyData(cont, found_unit, self.knowledge)
                         elif area_obj.data.get('column_label', None) and not area_obj.data.get('row_label', None):
                             continue
                         else:
@@ -613,7 +464,7 @@ class GlassExtractor(Module):
                                 continue
                             # if no property is found, use a placeholder to not lose the data
                             if not row in properties.keys():
-                                properties[row] = PropertyData(f'Miss-{property_placeholder_index}', 'Miss-')
+                                properties[row] = PropertyData(f'Miss-{property_placeholder_index}', 'Miss-', self.knowledge)
                                 property_placeholder_index += 1
                                 self.error_msg(f"No property for row {row} in table {table_area.oid}")
 
@@ -631,7 +482,8 @@ class GlassExtractor(Module):
                                     # self.error_msg(f"Unit mismatch: {properties[row].unit} vs {comp_unit}")
                             setpoints[current_point][properties[row].name] = {
                                 'value': cont,
-                                'unit': properties[row].unit
+                                'unit': properties[row].unit,
+                                'comment': properties[row].comment
                             }
 
                 table_order.append(table_area.oid)
@@ -686,7 +538,8 @@ class GlassExtractor(Module):
                 "hasTableCount": table_count,
                 "hasColumnCount": column_count
             },
-            'steps': result
+            'steps': result,
+            'claims': claims
         }
 
     def parse_titlepage(self, doc: Document):

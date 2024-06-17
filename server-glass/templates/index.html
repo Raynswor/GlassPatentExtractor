@@ -31,10 +31,10 @@
                 startLoading();
 
                 fetch(uploadURL,
-                {
-                    method: 'POST',
-                    body: formData
-                })
+                    {
+                        method: 'POST',
+                        body: formData
+                    })
                     .then(response => response.json())
                     .then(data => poll_for_updates(data['task_id']))
                     .catch(error => {
@@ -50,7 +50,7 @@
             // poll for updates
             polling = setInterval(() => {
                 check_status(task_id);
-            }, 10000);
+            }, 5000);
         }
 
         function check_status(taskId) {
@@ -70,8 +70,9 @@
                         displayFileDetails(data['result']['metadata']);
                         // display glass configurations
                         displaySteps(data['result']['steps']);
+                        displayClaims(data['result']['claims']);
                     } else if (data['status'] === 'failed') {
-                        alert('Task failed', data['result']); 
+                        alert('Task failed', data['result']);
                     }
                 })
                 .catch(error => {
@@ -121,28 +122,39 @@
             const table = document.getElementById('steps');
             // get all headers
             const headers = data.map((step, index) => {
-                return Object.keys(step['setpoints'])
+                return Object.entries(step['setpoints'])
             });
             //  make that flat
-            const flatHeaders = headers.flat();
-            //make unique
-            const uniqueHeaders = [...new Set(flatHeaders)];
+            const flatHeaders = headers.flat()
+            // [ [str, {}], ..]
+            //make unique without losing values
+            const uniqueHeaders = [...new Map(flatHeaders.map(item => [item[0], item])).values()]
+            console.log(uniqueHeaders)
 
             // create table headers
             // sort headers so columns with highest number of setpoints are on the left
-            uniqueHeaders.sort((a, b) => {
-                // number of non-null setpoints for a
-                return data.filter((step) => step['setpoints'][b]).length - data.filter((step) => step['setpoints'][a]).length;
-            });
+            // uniqueHeaders.sort((a, b) => {
+            //     return data.filter((step) => step['setpoints'][b]).length - data.filter((step) => step['setpoints'][a]).length;
+            // })
 
             let header_str = `
                 <tr>
                     <th>Glass</th>
             `;
-            uniqueHeaders.forEach((header) => {
+            uniqueHeaders.forEach((header, ix) => {
                 header_str += `
-                    <th colspan="2">${header}</th>
+                    <th colspan="2" 
+                    title="${header[1]['comment']}"
+                    style=`
+                if (header[1]['comment'] === "new") {
+                    header_str += '"background-color: #ff0000 "'
+                }
+                else {
+                    header_str += '"background-color: #f0f0f0 "'
+                }
+                header_str += `>${header[0]}</th>
                 `;
+                // add tooltip with description
             });
             header_str += `
                 </tr>
@@ -157,6 +169,7 @@
                         <th>${step['generatedObjectIdentifier']}</th>
                 `;
                     uniqueHeaders.forEach((header) => {
+                        header = header[0];
                         // if the header is not in the setpoints, add an empty cell
                         if (!step['setpoints'][header]) {
                             header_str += `
@@ -180,6 +193,21 @@
                 });
             table.innerHTML = header_str;
         }
+        function displayClaims(data) {
+            const div = document.getElementById('overview');
+            let tables = "<table border='1'>"
+            for (let i = 0; i < data.length; i++) {
+                let s = "<table border='1'>"
+                // per table
+                for (let j = 0; j < data[i].length; j++) {
+                    s += `<tr><td>${data[i][j][0]}</td><td>${data[i][j][1]}</td></tr>`
+                }
+                s += "</table>"
+                tables += s
+            }
+            div.innerHTML = tables;
+        }
+
         function downloadCSV() {
             //download the table as csv
             const table = document.getElementById('steps');
@@ -249,6 +277,11 @@
 
         function stopLoading() {
             document.getElementById('loader').classList.add('hidden');
+        }
+
+        function toggleContent() {
+            const content = document.getElementById('overview');
+            content.classList.toggle('expanded');
         }
     </script>
 
@@ -341,6 +374,9 @@
             height: 120px;
             animation: spin 2s linear infinite;
         }
+        .hidden {
+            display: none;
+        }
 
         @keyframes spin {
             0% {
@@ -361,8 +397,33 @@
             flex-direction: column;
         }
 
-        .hidden {
-            display: none;
+        .container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .expand-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .content {
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease-out;
+            padding: 0 10px;
+        }
+
+        .content.expanded {
+            height: auto;
+            padding: 10px;
         }
     </style>
 </head>
@@ -391,13 +452,30 @@
 
     <h2>Metadata</h2>
     <table id="metadata" border="1">
+        <tr>
+            <td>Not found</td>
+        </tr>
         <!-- File details will be inserted here -->
     </table>
+
+
+    <div class="container">
+        <div>
+            <button class="expand-button" onclick="toggleContent()">
+                <h2>↓ Claims</h2>
+            </button>
+        </div>
+        <div class="content" id="overview">
+        </div>
+    </div>
 
     <h2>Glass Configurations</h2>
     <!-- scrollable container -->
     <div style="overflow-x:auto;">
         <table id="steps" border="1">
+            <tr>
+                <td>Not found</td>
+            </tr>
             <!-- File details will be inserted here -->
         </table>
     </div>
@@ -406,4 +484,5 @@
         <div class="loader hidden" id="loader"></div>
     </div>
 </body>
+
 </html>

@@ -1,0 +1,127 @@
+{
+    "SiO₂": [
+        "(S|5)i(O|0|o|Q)(,|2)",
+        "Silicon oxide"
+    ],
+    "B₂O₃": [
+        "(B|Β)(,|2)(O|0|o|Q)3",
+        "Boron oxide"
+    ],
+    "Li₂O": [
+        "Li(,|2)(O|0|o|Q)",
+        "Lithium oxide"
+    ],
+    "MgO": [
+        "Mg(O|0|o|Q)"
+    ],
+    "Na₂O": [
+        "Na(2|,)(O|0|o|Q)",
+        "Sodium oxide"
+    ],
+    "M₂O": [
+        "M(,|2)(O|0|o|Q)"
+    ],
+    "RO": [
+        "R(O|0|o|Q)"
+    ],
+    "Al₂O₃": [
+        "A(l|I)(,|2)(O|0|o|Q)3",
+        "Aluminium oxide"
+    ],
+    "Ga₂O₃": [
+        "Ga(,|2)(O|0|o|Q)3",
+        "Gallium oxide"
+    ],
+    "K₂O": [
+        "(K|Κ)(,|2)(O|0|o|Q)",
+        "Potassium oxide"
+    ],
+    "CaO": [
+        "Ca(O|0|o|Q)",
+        "Calcium oxide"
+    ],
+    "BaO": [
+        "Ba(O|0|o|Q)",
+        "Barium oxide"
+    ],
+    "SrO": [
+        "(5|S)(R|r)(O|0|o|Q)",
+        "Strontium oxide"
+    ],
+    "SnO₂": [
+        "(5|S)n(O|0|o|Q)(,|2)",
+        "Tin oxide"
+    ],
+    "ZrO₂": [
+        "(Z|2)r(O|0|o|Q)(,|2)",
+        "Zirconium oxide"
+    ],
+    "TiO₂": [
+        "Ti(O|0|o|Q)(,|2)",
+        "Titanium oxide"
+    ],
+    "CeO₂": [
+        "Ce(O|0|o|Q)(,|2)",
+        "Cerium oxide"
+    ],
+    "NAOH": [
+        "NaOH",
+        "Na0H",
+        "Sodium hydroxide"
+    ],
+    "P₂O₅": [
+        "P(,|2)(O|0|o|Q)5",
+        "Phosphorus oxide"
+    ],
+    "R₂O": [
+        "R(,|2)(O|0|o|Q)"
+    ],
+    "Fe₂O₃": [
+        "Fe(,|2)(O|0|o|Q)3",
+        "Iron oxide"
+    ],
+    "NH4F": [
+        "NH4F",
+        "Ammonium fluoride"
+    ],
+    "SO₃": [
+        "(5|S)(O|0|o|Q)3",
+        "Sulfur oxide",
+        "So0,"
+    ],
+    "Anneal point": [
+        "Anneal*"
+    ],
+    "Strain point": [
+        "Strain*"
+    ],
+    "Softening point": [
+        "Softening*"
+    ],
+    "Youngs modulus": [
+        "Young*"
+    ],
+    "Poisson ratio": [
+        "Poisson*"
+    ],
+    "Refractive index": [
+        "Refractive*"
+    ],
+    "Glass transition point": [
+        "Glass transition*"
+    ],
+    "Thermal expansion coefficient": [
+        "Thermal expansion*",
+        "Themmal expansion"
+    ],
+    "Specific gravity": [
+        "Specific grav*"
+    ],
+    "Fracture toughness": [
+        "Fracture tough*"
+    ],
+    "log": [
+        "108",
+        "log"
+    ]
+}
