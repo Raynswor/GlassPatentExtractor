@@ -1,0 +1,39 @@
+FROM pytorch/pytorch:2.3.1-cuda11.8-cudnn8-runtime
+
+LABEL maintainer="Sebastian Kempf"
+LABEL version="0.1"
+LABEL description="Dockerfile for GlassPatentExtractor with Torch and CUDA support"
+
+# Set the working directory
+WORKDIR /usr/src/server
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install local modules
+COPY kieta-data-objs kieta-data-objs
+RUN pip install --no-cache-dir kieta-data-objs/.
+# Uncomment the line below and comment out the above line to install from git
+# RUN pip install --no-cache-dir git+https://gitlab+deploy-token-138:gldt-SntLC9xSsC3vzFNPGLUH@gitlab2.informatik.uni-wuerzburg.de/sek50xe/kieta_data_objs.git
+
+COPY kieta-modules kieta-modules
+RUN pip install --no-cache-dir kieta-modules/.
+
+# Copy project files
+COPY server-glass /usr/src/server
+
+# Expose Flask port
+EXPOSE 5000
+
+# Set the entry point
+ENTRYPOINT [ "flask", "run", "--host=0.0.0.0", "--port=5000" ]
