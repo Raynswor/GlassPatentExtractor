@@ -119,11 +119,12 @@
                 }
             },
             {
-                "name": "GlassExtractor",
+                "name": "GlassExtractorISC",
                 "parameter": {
                     "lines": "Line",
                     "string": "String",
-                    "knowledge": "/usr/src/server/mapping.json"
+                    "knowledge": "/usr/src/server/knowledge.json",
+                    "knowledge_fallback": "/usr/src/server/default_mapping.json"
                 }
             }
         ]

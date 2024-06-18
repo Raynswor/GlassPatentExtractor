@@ -1,0 +1,168 @@
+{
+    "SiO₂": [
+        "(S|5)i(O|0|o|Q|Φ)(\\.|,|2)",
+        "Silicon oxide"
+    ],
+    "B₂O₃": [
+        "(B|Β)(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Boron oxide"
+    ],
+    "Li₂O": [
+        "Li(\\.|,|2)(O|0|o|Q|Φ)",
+        "Lithium oxide"
+    ],
+    "MgO": [
+        "Mg(O|0|o|Q|Φ)"
+    ],
+    "Na₂O": [
+        "Na(2|,)(O|0|o|Q|Φ)",
+        "Sodium oxide"
+    ],
+    "M₂O": [
+        "M(\\.|,|2)(O|0|o|Q|Φ)"
+    ],
+    "RO": [
+        "R(O|0|o|Q|Φ)"
+    ],
+    "Al₂O₃": [
+        "A(l|I)(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Aluminium oxide"
+    ],
+    "Ga₂O₃": [
+        "Ga(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Gallium oxide"
+    ],
+    "K₂O": [
+        "(K|Κ|κ)(\\.|,|2)(O|0|o|Q|Φ)",
+        "Potassium oxide"
+    ],
+    "CaO": [
+        "Ca(O|0|o|Q|Φ)",
+        "Calcium oxide"
+    ],
+    "BaO": [
+        "Ba(O|0|o|Q|Φ)",
+        "Barium oxide"
+    ],
+    "SrO": [
+        "(5|S)(R|r)(O|0|o|Q|Φ)",
+        "Strontium oxide"
+    ],
+    "SnO₂": [
+        "(5|S)n(O|0|o|Q|Φ)(\\.|,|2)",
+        "Tin oxide"
+    ],
+    "ZrO₂": [
+        "(Z|2)r(O|0|o|Q|Φ)(\\.|,|2)",
+        "Zirconium oxide"
+    ],
+    "ZnO": [
+        "(Z|2)n(O|0|o|Q|Φ)",
+        "Zinc oxide"
+    ],
+    "TiO₂": [
+        "Ti(O|0|o|Q|Φ)(\\.|,|2)",
+        "Titanium oxide"
+    ],
+    "CeO₂": [
+        "Ce(O|0|o|Q|Φ)(\\.|,|2)",
+        "Cerium oxide"
+    ],
+    "NAOH": [
+        "NaOH",
+        "Na0H",
+        "Sodium hydroxide"
+    ],
+    "P₂O₅": [
+        "P(\\.|,|2)(O|0|o|Q|Φ)5",
+        "Phosphorus oxide"
+    ],
+    "R₂O": [
+        "R(\\.|,|2)(O|0|o|Q|Φ)"
+    ],
+    "Fe₂O₃": [
+        "Fe(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Iron oxide"
+    ],
+    "NH4F": [
+        "NH4F",
+        "Ammonium fluoride"
+    ],
+    "SO₃": [
+        "(5|S)(O|0|o|Q|Φ)3",
+        "Sulfur oxide",
+        "So0,"
+    ],
+    "Sb₂O₃": [
+        "S(b|θ|B)(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Antimony oxide"
+    ],
+    "As₂O₃": [
+        "A(s|5|S)(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Arsenic oxide"
+    ],
+    "NaOH": [
+        "N[a|A](O|0|o|Q|Φ)H",
+        "Sodium hydroxide"
+    ], 
+    "H₂0": [
+        "H(\\.|,|2)(O|0|o|Q|Φ)",
+        "Water"
+    ],
+    "HCl": [
+        "H(C|c)l",
+        "Hydrochloric acid"
+    ],
+    "Anneal point": [
+        "Anneal*"
+    ],
+    "Strain point": [
+        "Strain*"
+    ],
+    "Softening point": [
+        "Softening*"
+    ],
+    "Youngs modulus": [
+        "Young*"
+    ],
+    "Poisson ratio": [
+        "Poisson.*"
+    ],
+    "Refractive index": [
+        "Refractive.*"
+    ],
+    "Glass transition point": [
+        "Glass transition.*"
+    ],
+    "Thermal expansion coefficient": [
+        "Thermal expansion.*",
+        "Themmal expansion"
+    ],
+    "Specific gravity": [
+        "Specific grav.*"
+    ],
+    "Fracture toughness": [
+        "Fracture tough*"
+    ],
+    "T Liquidus": [
+        ".*iquidus"
+    ],
+    "Tg": [
+        "Tg"
+    ],
+    "T 2": [
+        ".*T( )?2"
+    ],
+    "T 4": [
+        ".*T( )?4"
+    ],
+    "T 7.6": [
+        ".*T( )?7(\\.|,)6"
+    ],
+    "T 13": [
+        ".*T( )?13"
+    ],
+    "T 14.5": [
+        ".*T( )?14(\\.|,)5"
+    ]
+}

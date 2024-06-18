@@ -248,10 +248,36 @@ def update_pipeline():
     logger.info("Pipeline updated successfully!")
     return Response({'status': 'Pipeline updated successfully!'}, status=200, mimetype='application/json')
 
-
 @app.route('/show', methods=['GET'])
 def index():
     return render_template('index.html')
+
+@app.route('/update_knowledge', methods=['POST'])
+def replace_knowledge():
+    import json
+    
+    try:
+        try:
+            knowledge = request.json
+        except Exception as e:
+            # try if it's a file
+            try:
+                knowledge = request.files['file']
+                knowledge = json.load(knowledge)
+            except Exception as e:
+                logger.error(e)
+                return Response({'status': 'Malformed request!'}, status=400, mimetype='application/json')
+        # save to json
+        with open(PATH / 'knowledge.json', 'w') as f:
+            json.dump(knowledge, f)
+        
+        pipelineManager.clear()
+        pipelineManager.read_from_file(PATH / 'pipeline.json')
+
+        return Response({'status': 'Knowledge updated successfully!'}, status=200, mimetype='application/json')
+    except Exception as e:
+        logger.error(e)
+        return Response({'status': 'Error updating knowledge!'}, status=500, mimetype='application/json')
 
 if __name__ == '__main__':
     app.run()

@@ -9,6 +9,20 @@ Additionally, a rudimentary user interface is provided where PDF files can be up
 - **Method:** GET
 - **Description:** Provides the user interface, see section "User Interface"
 
+## /update_knowledge
+- **Method:** POST
+- **Description:**: Updates the knowledge base
+- **Request Parameters:**
+  - `json`: raw json data in format {"replacement": ["regex1", "string1", ...]}
+  - OR: `file`: JSON file containing the replacement data
+- **Response:**
+  - **Status Code:** 200 OK
+- **Error Responses:**
+  - **Status Code:** 400 Bad Request
+    - **Description:** No valid json data found in the request.
+  - **Status Code:** 500 Internal Server Error
+    - **Description:** Error updating the knowledge base.
+
 ## /single_pdf
 - **Method:** POST
 - **Description:** Extracts metadata and glass configurations from a single PDF file.
