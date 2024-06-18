@@ -335,6 +335,21 @@
                     });
             }
         }
+
+        function downloadKnowledgeBase() {
+            fetch('/download_knowledge')
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'knowledge_base.json';
+                    a.click();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
     </script>
 
     <style>
@@ -425,6 +440,10 @@
             width: 120px;
             height: 120px;
             animation: spin 2s linear infinite;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
         }
 
         .hidden {
@@ -554,12 +573,16 @@
                 <button id="downloadButton" style="display: none;"></button>
             </div>
             <!-- button for knowledge update (json data)-->
-            <form id="knowledgeUpdate" enctype="multipart/form-data">
+            <div>
                 <button id="jsonInputButton" onclick="document.getElementById('jsonFile').click()">
                     &#8613; Upload Knowledge Base
                 </button>
                 <input type="file" id="jsonFile" name="jsonFile" accept=".json" style="display: none" onchange="handleKnowledgeUpdate(event)">
-            </form>
+
+                <button id="jsonDownloadButton" onclick="downloadKnowledgeBase()">
+                    &#8615; Download Knowledge Base
+                </button>
+            </div>
         </div>
 
         <div id="mainContent" style="display: flex; flex-direction: column; gap: 1em;">

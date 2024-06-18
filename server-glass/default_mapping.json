@@ -8,7 +8,7 @@
         "Boron oxide"
     ],
     "Li₂O": [
-        "Li(\\.|,|2)(O|0|o|Q|Φ)",
+        "L(i|l|I)(\\.|,|2)(O|0|o|Q|Φ)",
         "Lithium oxide"
     ],
     "MgO": [
@@ -25,7 +25,7 @@
         "R(O|0|o|Q|Φ)"
     ],
     "Al₂O₃": [
-        "A(l|I)(\\.|,|2)(O|0|o|Q|Φ)3",
+        "(A|Λ)(l|I)(\\.|,|2)(O|0|o|Q|Φ)3",
         "Aluminium oxide"
     ],
     "Ga₂O₃": [
@@ -63,6 +63,10 @@
     "TiO₂": [
         "Ti(O|0|o|Q|Φ)(\\.|,|2)",
         "Titanium oxide"
+    ],
+    "Y₂O₃": [
+        "Y(\\.|,|2)(O|0|o|Q|Φ)3",
+        "Yttrium oxide"
     ],
     "CeO₂": [
         "Ce(O|0|o|Q|Φ)(\\.|,|2)",

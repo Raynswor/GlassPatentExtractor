@@ -279,5 +279,23 @@ def replace_knowledge():
         logger.error(e)
         return Response({'status': 'Error updating knowledge!'}, status=500, mimetype='application/json')
 
+
+@app.route('/download_knowledge', methods=['GET'])
+def download_knowledge():
+    import json
+    try:
+        with open(PATH / 'knowledge.json', 'r') as f:
+            knowledge = json.load(f)
+        return jsonify(knowledge)
+    except Exception as e:
+        try: 
+            with open(PATH / 'default_mapping.json', 'r') as f:
+                knowledge = json.load(f)
+            return jsonify(knowledge)
+        except Exception as e:
+            logger.error(e)
+            return Response({'status': 'Error downloading knowledge!'}, status=500, mimetype='application/json')
+
+
 if __name__ == '__main__':
     app.run()
